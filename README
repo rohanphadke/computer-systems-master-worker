@@ -1,0 +1,30 @@
+The submitted code implements a master-worker multi-process solution to compute exponential function.
+Each different worker spawned by the master computes a different term of the expansion of exponential function.
+Value of each term is communicated to the master through pipes and the master then sums all of the values to get the fnal answer.
+For any pair of values for x and n, the value of e^x is computer for the first (n+1) terms - from 0 to n, the term correecponding to 0 being trivially 1.
+
+The logic has been implemented over 4 mechanisms:
+1) sequential 	- where each worker executes sequentially.
+2) select		- where all workers are spawned and the master waits for some worker to finish execution using select system call
+3) poll			- process similar to select
+4) epoll		- process similar to poll
+
+--> sequential is slow as the workers are executed one after the other.
+--> select is faster as workers are spawned together. Using FD_ISSET to find which one of the many workers is active is inefficient and takes up a lot of time.
+--> poll improves over the problems faced by select, but is similar in the sense that all workers are spawned toghether without waiting for one to finish execution.
+--> epoll is the latest mechanism and is faster than all others.
+
+How to run file:
+(The default values for x and n have been taken as x=2 and n=10 in the makefile. However, the program works for all other values as well)
+
+make / make all - runs the entire makefile. cleans all binaries and then runs master with sequential, select, poll and epoll mechanism one after the other, followed by the worker indepenently.
+
+make clean - cleans all binaries
+
+make worker.o - creates worker.o binary
+
+make master.o - creates master.o binary
+
+make sequential / make select / make poll / make epoll - runs the master with corresponding mechanism
+
+make worker - runs the worker independently
